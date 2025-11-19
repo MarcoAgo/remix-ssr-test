@@ -1,4 +1,46 @@
-.react-router
-build
+# Dependencies
 node_modules
+npm-debug.log
+yarn-error.log
+
+# Build outputs
+build
+dist
+.output
+
+# Environment files
+.env
+.env.local
+.env.*.local
+
+# IDE
+.vscode
+.idea
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Git
+.git
+.gitignore
+
+# Documentation
 README.md
+DEPLOYMENT.md
+*.md
+
+# CI/CD
+.github
+.gitlab-ci.yml
+
+# Testing
+coverage
+.nyc_output
+
+# Misc
+*.log
+.cache
