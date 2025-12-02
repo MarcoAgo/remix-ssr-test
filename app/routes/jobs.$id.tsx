@@ -1,68 +1,9 @@
 import type { Route } from "./+types/jobs.$id";
 import { Link } from "react-router";
-import { getJobById, formatSalary, formatJobType } from "../lib/jobs";
+import { formatSalary, formatJobType } from "../lib/jobs";
+import { loader, meta } from "../lib/loaders/jobs";
 
-export async function loader({ params }: Route.LoaderArgs) {
-  const { id } = params;
-
-  if (!id) {
-    throw new Response("Job ID is required", { status: 400 });
-  }
-
-  // SSR fetch - this runs on the server
-  const job = await getJobById(id);
-
-  if (!job) {
-    throw new Response("Job not found", { status: 404 });
-  }
-
-  return {
-    job,
-  };
-}
-
-export function meta({ loaderData }: Route.MetaArgs) {
-  const { job } = loaderData;
-
-  if (!job) {
-    return [{ title: "Job Not Found" }];
-  }
-
-  const description = `${job.title} at ${job.company} - ${job.location}. ${job.description.substring(0, 150)}...`;
-  const salaryText = job.salary ? `Salary: ${formatSalary(job.salary)}` : "";
-
-  return [
-    { title: `${job.title} at ${job.company} - Job Board` },
-    {
-      name: "description",
-      content: description,
-    },
-    {
-      property: "og:title",
-      content: `${job.title} at ${job.company}`,
-    },
-    {
-      property: "og:description",
-      content: description,
-    },
-    {
-      property: "og:type",
-      content: "article",
-    },
-    {
-      name: "twitter:card",
-      content: "summary",
-    },
-    {
-      name: "twitter:title",
-      content: `${job.title} at ${job.company}`,
-    },
-    {
-      name: "twitter:description",
-      content: description,
-    },
-  ];
-}
+export { loader, meta };
 
 export default function JobDetail({ loaderData }: Route.ComponentProps) {
   const { job } = loaderData;
@@ -230,7 +171,7 @@ export default function JobDetail({ loaderData }: Route.ComponentProps) {
                   Requirements
                 </h2>
                 <ul className="space-y-2">
-                  {job.requirements.map((requirement, index) => (
+                  {job.requirements.map((requirement: string, index: number) => (
                     <li
                       key={index}
                       className="flex items-start text-gray-700 dark:text-gray-300"
@@ -254,36 +195,25 @@ export default function JobDetail({ loaderData }: Route.ComponentProps) {
             )}
 
             <footer className="pt-6 border-t border-gray-200 dark:border-gray-700">
-              {job.applyUrl ? (
-                <a
-                  href={job.applyUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-colors"
+              <Link
+                to={`/jobs/${job.id}/apply`}
+                className="inline-flex items-center px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-colors"
+              >
+                Apply Now
+                <svg
+                  className="w-5 h-5 ml-2"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
                 >
-                  Apply Now
-                  <svg
-                    className="w-5 h-5 ml-2"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"
-                    />
-                  </svg>
-                </a>
-              ) : (
-                <button
-                  disabled
-                  className="inline-flex items-center px-6 py-3 bg-gray-400 text-white font-medium rounded-lg cursor-not-allowed"
-                >
-                  Apply URL not available
-                </button>
-              )}
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"
+                  />
+                </svg>
+              </Link>
             </footer>
           </article>
         </div>
